@@ -3,8 +3,9 @@
 #ifndef SATSALES_H_
 #define SATSALES_H_
 
-#include"Sale.h";
-#include"Account.h"
+#include"../Service/Sale.h";
+#include"../Service/Account.h"
+
 
 /*typedef enum
 {
@@ -31,10 +32,9 @@ typedef struct sale_node
 }sale_node_t,*sale_node_t;
 */
 //根据id获得销售额统计
-int SatSales_Srv_CompSaleVal(int user_id,ttms_);
+int SatSales_Srv_CompSaleVal(int user_id,ttms_date_t strtime,ttms_date_t endtime);
 
 
-//根据id获得系统用户
-void Account_Srv_FetchByID(int user_id);
 
+//
 #endif
