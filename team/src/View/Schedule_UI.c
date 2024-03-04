@@ -7,8 +7,122 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./Ticket_UI.h"
+int Schedule_UI_MgtEnt()
+{
+    int i, id;
+	int choice;
 
-void Schedule_UI_ListAll(void) //²éÑ¯ÑÝ³ö½çÃæ 
+	schedule_list_t head;
+	schedule_node_t *pos;
+	Pagination_t paging;
+
+	List_Init(head, schedule_node_t);
+	paging.offset = 0;
+	paging.pageSize = SCHEDULE_PAGE_SIZE;
+
+	paging.totalRecords = Schedule_Srv_FetchAll(head);
+	Paging_Locate_FirstPage(head, paging);
+	do {
+        //????????????????
+		printf(
+				"\n==================================================================\n");
+		printf(
+				"************************** ï¿½Ý³ï¿½ï¿½Æ»ï¿½ï¿½ï¿½Ï¢ ************************\n");
+		printf("%8s %8s  %8s  %8s    %8s      %8s\n", "ï¿½Ý³ï¿½ï¿½Æ»ï¿½ID", "ï¿½ï¿½Ó³ï¿½ï¿½Ä¿ID", "ï¿½Ý³ï¿½ï¿½ï¿½ID",
+				"ï¿½ï¿½Ó³ï¿½ï¿½ï¿½ï¿½", "ï¿½ï¿½Ó³Ê±ï¿½ï¿½","ï¿½ï¿½Î»ï¿½ï¿½");
+		printf(
+				"------------------------------------------------------------------\n");
+		
+		Paging_ViewPage_ForEach(head, paging, schedule_node_t, pos, i){
+			printf("%6d   %8d  %8d      %d/%d/%d    %d:%d:%d %8d \n", pos->data.id,
+					pos->data.play_id, pos->data.studio_id, pos->data.date.year,
+					pos->data.date.month,pos->data.date.day,pos->data.time.hour,
+					pos->data.time.minute,pos->data.time.second,pos->data.seat_count);
+		}
+
+		printf(
+				"--------------- ï¿½ï¿½:%2dÒ³ ----------------------- Ò³ï¿½ï¿½ :%2d/%2d -----\n",
+				paging.totalRecords, Pageing_CurPage(paging),
+				Pageing_TotalPages(paging));
+		
+        
+        
+        printf("\n\n\n\n"); 
+        
+        
+        printf(
+				"******************************************************************\n");
+		printf(
+				"[1]ï¿½ï¿½Ò»Ò³         |   [2]ï¿½ï¿½Ò»Ò³         |   [3]ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½   |\n[4]É¾ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½   |   [5]ï¿½Þ¸ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½   |   [6]ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½Æ±     |\n[0]ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½       |");
+		printf(
+				"\n\n\n\n==================================================================\n");
+        printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ÐµÄ²ï¿½ï¿½ï¿½:");
+		fflush(stdin);
+        setbuf(stdin,NULL);
+		scanf("%d", &choice);
+		setbuf(stdin,NULL);
+		fflush(stdin);
+
+
+     
+		switch (choice) {
+		case 3:
+            system("clear");
+			printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Éµï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½ï¿½Ä¾ï¿½Ä¿ID:");
+			scanf("%d", &id);
+			if (Schedule_UI_Add(id)) 
+			{
+				paging.totalRecords = Schedule_Srv_FetchAll(head);
+				Paging_Locate_LastPage(head, paging, schedule_node_t);
+			}
+			break;
+		case 4:
+            system("clear");
+			printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÒªÉ¾ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½ID:");
+			scanf("%d", &id);
+			if (Schedule_UI_Delete(id)) {	
+				paging.totalRecords = Schedule_Srv_FetchAll(head);
+				List_Paging(head, paging, schedule_node_t);
+			}
+			break;
+		case 5:
+            system("clear");
+			printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Þ¸Äµï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½ID");
+			scanf("%d", &id);
+			if (Schedule_UI_Modify(id)) {	
+				paging.totalRecords = Schedule_Srv_FetchAll(head);
+				List_Paging(head, paging, schedule_node_t);
+			}
+			break;
+		case 6:
+            system("clear");
+			int id;
+			printf("ï¿½ï¿½Ñ¡ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½ï¿½ï¿½ï¿½Ý³ï¿½Æ±(ID):");
+			scanf("%d",&id);
+			Ticket_UI_MgtEntry(id);
+			break;
+		case 1:
+            system("clear");
+			if (!Pageing_IsFirstPage(paging)) {
+				Paging_Locate_OffsetPage(head, paging, -1, schedule_node_t);
+			}
+			break;
+		case 2:
+            system("clear");
+			if (!Pageing_IsLastPage(paging)) {
+				Paging_Locate_OffsetPage(head, paging, 1, schedule_node_t);
+			}
+			break;
+		}
+	} while (choice != 0);
+	//??????????
+    system("clear");
+	List_Destroy(head, schedule_node_t);
+
+    return 0;
+}
+
+void Schedule_UI_ListAll(void) 
 {
 	int i, id;
 	int choice;
@@ -24,13 +138,13 @@ void Schedule_UI_ListAll(void) //²éÑ¯ÑÝ³ö½çÃæ
 	paging.totalRecords = Schedule_Srv_FetchAll(head);
 	Paging_Locate_FirstPage(head, paging);
 	do {
-        
+        //????????????????
 		printf(
 				"\n==========================================================\n");
 		printf(
-				"********************** ÑÝ³ö¼Æ»®ÐÅÏ¢ **********************\n");
-		printf("%8s %8s  %8s  %8s  %8s %8s\n", "ÑÝ³ö¼Æ»®ID", "ÉÏÓ³¾çÄ¿ID", "ÑÝ³öÌüID",
-				"·ÅÓ³ÈÕÆÚ", "·ÅÓ³Ê±¼ä","×ùÎ»Êý");
+				"********************** ï¿½Ý³ï¿½ï¿½Æ»ï¿½ï¿½ï¿½Ï¢ **********************\n");
+		printf("%8s %8s  %8s  %8s  %8s %8s\n", "ï¿½Ý³ï¿½ï¿½Æ»ï¿½ID", "ï¿½ï¿½Ó³ï¿½ï¿½Ä¿ID", "ï¿½Ý³ï¿½ï¿½ï¿½ID",
+				"ï¿½ï¿½Ó³ï¿½ï¿½ï¿½ï¿½", "ï¿½ï¿½Ó³Ê±ï¿½ï¿½","ï¿½ï¿½Î»ï¿½ï¿½");
 		printf(
 				"----------------------------------------------------------\n");
 		
@@ -40,8 +154,9 @@ void Schedule_UI_ListAll(void) //²éÑ¯ÑÝ³ö½çÃæ
 					pos->data.date.month,pos->data.date.day,pos->data.time.hour,
 					pos->data.time.minute,pos->data.time.second,pos->data.seat_count);
 		}
-	printf(
-				"------- ¹²:%2dÒ³ ------------------------- Ò³Êý :%2d/%2d ----\n",
+
+		printf(
+				"------- ï¿½ï¿½:%2dÒ³ ------------------------- Ò³ï¿½ï¿½ :%2d/%2d ----\n",
 				paging.totalRecords, Pageing_CurPage(paging),
 				Pageing_TotalPages(paging));
 		
@@ -53,10 +168,10 @@ void Schedule_UI_ListAll(void) //²éÑ¯ÑÝ³ö½çÃæ
         printf(
 				"**********************************************************\n");
 		printf(
-				"[1]ÉÏÒ»Ò³    |   [2]ÏÂÒ»Ò³   |   [3] ¸ù¾ÝÃû×ÖÉ¸Ñ¡ÑÝ³ö¼Æ»®\n[0]·µ»ØÉÏ²ã  |");
+				"[1]ï¿½ï¿½Ò»Ò³    |   [2]ï¿½ï¿½Ò»Ò³   |   [3] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¸Ñ¡ï¿½Ý³ï¿½ï¿½Æ»ï¿½\n[0]ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½  |");
 		printf(
 				"\n\n\n\n==========================================================\n");
-        printf("ÇëÊäÈëÄúÒª½øÐÐµÄ²Ù×÷:");
+        printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ÐµÄ²ï¿½ï¿½ï¿½:");
 		fflush(stdin);
         setbuf(stdin,NULL);
 		scanf("%d", &choice);
@@ -69,7 +184,7 @@ void Schedule_UI_ListAll(void) //²éÑ¯ÑÝ³ö½çÃæ
 		case 3:
 			
             system("clear");
-			printf("ÇëÊäÈëÒª²éÑ¯µÄ¾çÄ¿Ãû×Ö:");
+			printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ñ¯ï¿½Ä¾ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½:");
 			scanf("%s", name);
 			if (Schedule_UI_Query(name)) 
 			{
@@ -95,9 +210,201 @@ void Schedule_UI_ListAll(void) //²éÑ¯ÑÝ³ö½çÃæ
     system("clear");
 	List_Destroy(head, schedule_node_t);
 
-    
+    return 0;
 }
-int Schedule_UI_Query(char *play_name) //¸ù¾Ý¾çÄ¿Ãû³Æ»ñÈ¡ÑÝ³ö¼Æ»® 
+
+int Schedule_UI_Add(int play_id)
+ {
+	 play_t buf;
+	if( !Play_Srv_FetchByID(play_id,&buf ) )
+	{
+		printf("ï¿½Ã¾ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\n");
+		printf("ï¿½ï¿½[ENTER]ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½\n");
+		setbuf(stdin,NULL);
+		getchar();
+		return 0;
+	}
+
+
+	schedule_t rec;
+	int newRecCount = 0;
+	char choice;
+
+	do {
+		system("clear");
+		printf("\n=======================================================\n");
+		printf("****************  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½  ****************\n");
+		printf("-------------------------------------------------------\n");
+		
+		
+		
+		
+		printf("ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½%s\n",buf.name);
+		rec.play_id = play_id;
+		printf("ï¿½Ý³ï¿½ï¿½ï¿½ID:");//ï¿½Ð¶ï¿½
+		setbuf(stdin,NULL);
+		scanf("%d",&rec.studio_id);
+		studio_t buf;
+		while( !Studio_Srv_FetchByID(rec.studio_id, &buf)  )
+	{
+		printf("ï¿½ï¿½ï¿½Ý³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\n");
+		printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½ï¿½ID:");
+		setbuf(stdin,NULL);
+		scanf("%d",&rec.studio_id);
+	}
+		
+		
+		printf("ï¿½ï¿½Ó³ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½/ï¿½ï¿½/ï¿½ï¿½):");
+		fflush(stdin);
+		setbuf(stdin,NULL);
+		scanf("%d/%d/%d",&rec.date.year,&rec.date.month,&rec.date.day);
+
+		printf("ï¿½ï¿½Ó³Ê±ï¿½ï¿½(Ê±/ï¿½ï¿½/ï¿½ï¿½):");
+		fflush(stdin);
+		setbuf(stdin,NULL);
+		scanf("%d/%d/%d",&rec.time.hour,&rec.time.minute,&rec.time.second);
+
+		seat_list_t seat_list;
+		List_Init(seat_list,seat_node_t);
+		int stand_seatCount = Seat_Srv_FetchValidByRoomID(seat_list,buf.id);
+		printf("ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½(<=%d):",stand_seatCount);//ï¿½Ð¶ï¿½
+		fflush(stdin);
+		setbuf(stdin,NULL);
+		scanf("%d",&rec.seat_count);
+		while( rec.seat_count > stand_seatCount )
+	{
+		printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½(<=%d):",stand_seatCount);
+		setbuf(stdin,NULL);
+		scanf("%d",&rec.seat_count);
+	}
+		
+		printf("=======================================================\n");
+
+		if (Schedule_Srv_Add(&rec)) {
+			newRecCount += 1;
+			printf("ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½ï¿½ï¿½ï¿½Ó³É¹ï¿½!\n");
+
+		} else
+			printf("ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½!\n");
+
+		printf("-------------------------------------------------------\n");
+		printf("[A]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, [R]ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½:");
+		fflush(stdin);
+
+		while (getchar() != '\n');
+		setbuf(stdin,NULL);
+		scanf("%c", &choice);
+	} while ('a' == choice || 'A' == choice);
+	system("clear");
+	return newRecCount;
+}
+
+int Schedule_UI_Modify(int id)
+ {
+	int rtn = 0;
+	schedule_t rec;
+	schedule_list_t list;
+	int seatcount;
+
+	/*Load record*/
+	if (!Schedule_Srv_FetchByID(id, &rec)) {
+		printf("ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\nï¿½ï¿½ [Enter] ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½!\n");
+		setbuf(stdin,NULL);
+		getchar();
+		return 0;
+	}
+	else
+	{
+		
+	
+	
+
+	printf("\n=======================================================\n");
+	printf("****************  ï¿½Þ¸ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½  ****************\n");
+	printf("-------------------------------------------------------\n");
+
+		printf("ï¿½ï¿½Ä¿ID:");
+		setbuf(stdin,NULL);
+		scanf("%d",&rec.play_id);
+		play_t buf;
+		while( !Play_Srv_FetchByID(rec.play_id,&buf ) )
+		{
+			printf("ï¿½Ã¾ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\n");
+			printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ID\n:",rec.play_id);
+			setbuf(stdin,NULL);
+			scanf("%d",&rec.play_id);
+		}
+		printf("ï¿½Ý³ï¿½ï¿½ï¿½ID:");//ï¿½Ð¶ï¿½
+		setbuf(stdin,NULL);
+		scanf("%d",&rec.studio_id);
+		studio_t buf2;
+		while( !Studio_Srv_FetchByID(rec.studio_id, &buf2)  )
+	{
+		printf("ï¿½ï¿½ï¿½Ý³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\n");
+		printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½ï¿½ID:");
+		setbuf(stdin,NULL);
+		scanf("%d",&rec.studio_id);
+	}
+		
+		
+		printf("ï¿½ï¿½Ó³ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½/ï¿½ï¿½/ï¿½ï¿½):");
+		fflush(stdin);
+		setbuf(stdin,NULL);
+		scanf("%d/%d/%d",&rec.date.year,&rec.date.month,&rec.date.day);
+
+		printf("ï¿½ï¿½Ó³Ê±ï¿½ï¿½(Ê±/ï¿½ï¿½/ï¿½ï¿½):");
+		fflush(stdin);
+		setbuf(stdin,NULL);
+		scanf("%d/%d/%d",&rec.time.hour,&rec.time.minute,&rec.time.second);
+
+		seat_list_t seat_list;
+		List_Init(seat_list,seat_node_t);
+		int stand_seatCount = Seat_Srv_FetchValidByRoomID(seat_list,rec.studio_id);
+		printf("ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½(<=%d):",stand_seatCount);//ï¿½Ð¶ï¿½
+		fflush(stdin);
+		setbuf(stdin,NULL);
+		scanf("%d",&rec.seat_count);
+		while( rec.seat_count > stand_seatCount )
+	{
+		printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½(<=%d):",stand_seatCount);
+		setbuf(stdin,NULL);
+		scanf("%d",&rec.seat_count);
+	}
+
+	
+
+	printf("-------------------------------------------------------\n");
+
+	if (Schedule_Srv_Modify(&rec)) {
+		rtn = 1;
+		printf(
+				"ï¿½É¹ï¿½ï¿½Þ¸Ä¾ï¿½Ä¿ï¿½ï¿½Ï¢!\nï¿½ï¿½ï¿½ï¿½ [Enter] ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½!\n");
+	} else
+		printf("ï¿½Þ¸Ä¾ï¿½Ä¿ï¿½ï¿½Ï¢Ê§ï¿½ï¿½!\nPress [Enter]ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½!\n");
+
+	setbuf(stdin,NULL);
+	getchar();
+}
+	return rtn;
+}
+
+int Schedule_UI_Delete(int id) 
+{
+	int rtn = 0;
+
+	if (Schedule_Srv_DeleteByID(id)) {
+		printf(
+				"ï¿½É¹ï¿½É¾ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½!\nï¿½ï¿½ï¿½ï¿½[Enter] ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½!\n");
+		rtn = 1;
+	} else {
+		printf("ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!\nï¿½ï¿½ï¿½ï¿½ [Enter] ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½!\n");
+	}
+	setbuf(stdin,NULL);
+	getchar();
+	system("clear");
+	return rtn;
+}
+int Schedule_UI_Query(char *play_name) 
 {
 	play_list_t list_p;
 	schedule_list_t list_s;
@@ -117,7 +424,7 @@ int Schedule_UI_Query(char *play_name) //¸ù¾Ý¾çÄ¿Ãû³Æ»ñÈ¡ÑÝ³ö¼Æ»®
 	{
 		len++;
 	}
-	//´òÓ¡ÑÝ³ö¼Æ»®
+	//ï¿½ï¿½Ó¡ï¿½Ý³ï¿½ï¿½Æ»ï¿½
 	schedule_node_t *pos;
 	Pagination_t paging;
 
@@ -131,9 +438,9 @@ int Schedule_UI_Query(char *play_name) //¸ù¾Ý¾çÄ¿Ãû³Æ»ñÈ¡ÑÝ³ö¼Æ»®
 		printf(
 				"\n==================================================================\n");
 		printf(
-				"********************** ÑÝ³ö¼Æ»®ÐÅÏ¢ **********************\n");
-		printf("%8s %8s  %8s  %8s  %8s %8s\n", "ÑÝ³ö¼Æ»®ID", "ÉÏÓ³¾çÄ¿ID", "ÑÝ³öÌüID",
-				"·ÅÓ³ÈÕÆÚ", "·ÅÓ³Ê±¼ä","×ùÎ»Êý");
+				"********************** ï¿½Ý³ï¿½ï¿½Æ»ï¿½ï¿½ï¿½Ï¢ **********************\n");
+		printf("%8s %8s  %8s  %8s  %8s %8s\n", "ï¿½Ý³ï¿½ï¿½Æ»ï¿½ID", "ï¿½ï¿½Ó³ï¿½ï¿½Ä¿ID", "ï¿½Ý³ï¿½ï¿½ï¿½ID",
+				"ï¿½ï¿½Ó³ï¿½ï¿½ï¿½ï¿½", "ï¿½ï¿½Ó³Ê±ï¿½ï¿½","ï¿½ï¿½Î»ï¿½ï¿½");
 		printf(
 				"------------------------------------------------------------------\n");
 		
@@ -145,12 +452,12 @@ int Schedule_UI_Query(char *play_name) //¸ù¾Ý¾çÄ¿Ãû³Æ»ñÈ¡ÑÝ³ö¼Æ»®
 		}
 
 		printf(
-				"------- ¹²:%2dÒ³ ----------------------- Ò³Êý :%2d/%2d ----\n",
+				"------- ï¿½ï¿½:%2dÒ³ ----------------------- Ò³ï¿½ï¿½ :%2d/%2d ----\n",
 				paging.totalRecords, Pageing_CurPage(paging),
 				Pageing_TotalPages(paging));
         printf(
 				"******************************************************************\n");
-	printf("°´[ENTER]·µ»ØÉÏ²ã!");
+	printf("ï¿½ï¿½[ENTER]ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½!");
 	setbuf(stdin,NULL);
 	getchar();
 	system("clear");
@@ -158,133 +465,10 @@ int Schedule_UI_Query(char *play_name) //¸ù¾Ý¾çÄ¿Ãû³Æ»ñÈ¡ÑÝ³ö¼Æ»®
 
 }
 
-//
+/*???ï¿½ï¿½????????????????????????*/
 void Schedule_UI_ListByPlay(play_t *play, schedule_list_t list,
 		Pagination_t paging) {
-			
-			
 }
 
-int Schedule_UI_MgtEnt()
-{
-    int i, id;
-	int choice;
-
-	schedule_list_t head;
-	schedule_node_t *pos;
-	Pagination_t paging;
-
-	List_Init(head, schedule_node_t);
-	paging.offset = 0;
-	paging.pageSize = SCHEDULE_PAGE_SIZE;
-
-	paging.totalRecords = Schedule_Srv_FetchAll(head);
-	Paging_Locate_FirstPage(head, paging);
-	do {
-        //????????????????
-		printf(
-				"\n==================================================================\n");
-		printf(
-				"************************** ÑÝ³ö¼Æ»®ÐÅÏ¢ ************************\n");
-		printf("%8s %8s  %8s  %8s    %8s      %8s\n", "ÑÝ³ö¼Æ»®ID", "ÉÏÓ³¾çÄ¿ID", "ÑÝ³öÌüID",
-				"·ÅÓ³ÈÕÆÚ", "·ÅÓ³Ê±¼ä","×ùÎ»Êý");
-		printf(
-				"------------------------------------------------------------------\n");
-		
-		Paging_ViewPage_ForEach(head, paging, schedule_node_t, pos, i){
-			printf("%6d   %8d  %8d      %d/%d/%d    %d:%d:%d %8d \n", pos->data.id,
-					pos->data.play_id, pos->data.studio_id, pos->data.date.year,
-					pos->data.date.month,pos->data.date.day,pos->data.time.hour,
-					pos->data.time.minute,pos->data.time.second,pos->data.seat_count);
-		}
-
-		printf(
-				"--------------- ¹²:%2dÒ³ ----------------------- Ò³Êý :%2d/%2d -----\n",
-				paging.totalRecords, Pageing_CurPage(paging),
-				Pageing_TotalPages(paging));
-		
-        
-        
-        printf("\n\n\n\n"); 
-        
-        
-        printf(
-				"******************************************************************\n");
-		printf(
-				"[1]ÉÏÒ»Ò³         |   [2]ÏÂÒ»Ò³         |   [3]Ìí¼ÓÑÝ³ö¼Æ»®   |\n[4]É¾³ýÑÝ³ö¼Æ»®   |   [5]ÐÞ¸ÄÑÝ³ö¼Æ»®   |   [6]Éú³ÉÑÝ³öÆ±     |\n[0]·µ»ØÉÏ²ã       |");
-		printf(
-				"\n\n\n\n==================================================================\n");
-        printf("ÇëÊäÈëÄúÒª½øÐÐµÄ²Ù×÷:");
-		fflush(stdin);
-        setbuf(stdin,NULL);
-		scanf("%d", &choice);
-		setbuf(stdin,NULL);
-		fflush(stdin);
-
-
-     
-		switch (choice) {
-		case 3:
-            system("clear");
-			printf("ÇëÊäÈëÒªÉú³ÉµÄÑÝ³ö¼Æ»®µÄ¾çÄ¿ID:");
-			scanf("%d", &id);
-			if (Schedule_UI_Add(id)) 
-			{
-				paging.totalRecords = Schedule_Srv_FetchAll(head);
-				Paging_Locate_LastPage(head, paging, schedule_node_t);
-			}
-			break;
-		case 4:
-            system("clear");
-			printf("ÇëÊäÈëÒªÉ¾³ýµÄÑÝ³ö¼Æ»®ID:");
-			scanf("%d", &id);
-			if (Schedule_UI_Delete(id)) {	
-				paging.totalRecords = Schedule_Srv_FetchAll(head);
-				List_Paging(head, paging, schedule_node_t);
-			}
-			break;
-		case 5:
-            system("clear");
-			printf("ÇëÊäÈëÒªÐÞ¸ÄµÄÑÝ³ö¼Æ»®ID");
-			scanf("%d", &id);
-			if (Schedule_UI_Modify(id)) {	
-				paging.totalRecords = Schedule_Srv_FetchAll(head);
-				List_Paging(head, paging, schedule_node_t);
-			}
-			break;
-		case 6:
-            system("clear");
-			int id;
-			printf("ÇëÑ¡ÔñÒª¹ÜÀíÄÄ¸öÑÝ³ö¼Æ»®µÄÑÝ³öÆ±(ID):");
-			scanf("%d",&id);
-			Ticket_UI_MgtEntry(id);
-			break;
-		case 1:
-            system("clear");
-			if (!Pageing_IsFirstPage(paging)) {
-				Paging_Locate_OffsetPage(head, paging, -1, schedule_node_t);
-			}
-			break;
-		case 2:
-            system("clear");
-			if (!Pageing_IsLastPage(paging)) {
-				Paging_Locate_OffsetPage(head, paging, 1, schedule_node_t);
-			}
-			break;
-		}
-	} while (choice != 0);
-
-    system("clear");
-	List_Destroy(head, schedule_node_t);
-
-    return 0;
-}
-
-
-
-
-//°²ÅÅÑÝ³ö½çÃæ 
 void Schedule_UI_MgtEntry(int play_id) {
-
 }
-

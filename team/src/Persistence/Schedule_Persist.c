@@ -12,12 +12,12 @@ static const char SCHEDULE_DATA_FILE[] = "Schedule.dat";
 static const char SCHEDULE_DATA_TEMP_FILE[] = "ScheduleTmp.dat";
 static const char SCHEDULE_KEY_NAME[]="Schedule";
 
-int Schedule_Perst_Insert(schedule_t *data)//´¢´æĞÂÑİ³ö¼Æ»®
+int Schedule_Perst_Insert(schedule_t *data)//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ³ï¿½ï¿½Æ»ï¿½
 {
 	assert(NULL!=data);
 
 	
-	long key = EntKey_Perst_GetNewKeys(SCHEDULE_KEY_NAME, 1); //»ñÈ¡Ö÷¼ü
+	long key = EntKey_Perst_GetNewKeys(SCHEDULE_KEY_NAME, 1); //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
 	if(key<=0)	
 	{
 			printf("Key <= 0\n");
@@ -65,7 +65,7 @@ int Schedule_Perst_SelectByPlay(schedule_list_t buf, int play_id)
 				
 
 				p->data = data;
-				List_AddTail(q,p);//Î²²å·¨, //??????????????????????????????????????????????
+				List_AddTail(q,p);//Î²ï¿½å·¨, //??????????????????????????????????????????????
 				found++;
 				q=p;
 			}
@@ -80,9 +80,9 @@ int Schedule_Perst_SelectByPlay(schedule_list_t buf, int play_id)
 	fclose(fp);
 
 	return found;//????????????????????????????????????
-}//¸ù¾İ¾çÄ¿IDÔØÈëÑİ³ö¼Æ»® 
+}//ï¿½ï¿½ï¿½İ¾ï¿½Ä¿IDï¿½ï¿½ï¿½ï¿½ï¿½İ³ï¿½ï¿½Æ»ï¿½ 
 	
-	//¸ù¾İID´ÓÎÄ¼şÖĞÔØÈëÒ»¸öÑİ³öÌüµÄÊı¾İ¡£
+	//ï¿½ï¿½ï¿½ï¿½IDï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½İ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ¡ï¿½
 	/*
 	int Studio_Perst_SelectByID(int ID, studio_t *buf) {
 	assert(NULL!=buf);
@@ -114,7 +114,7 @@ int Schedule_Perst_SelectByPlay(schedule_list_t buf, int play_id)
 
 
 
-int Schedule_Perst_SelectAll(schedule_list_t list)//ÔØÈëÈ«²¿Ñİ³ö¼Æ»® 
+int Schedule_Perst_SelectAll(schedule_list_t list)//ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½İ³ï¿½ï¿½Æ»ï¿½ 
 {
 	schedule_node_t *newNode;
 	schedule_t data;
@@ -149,7 +149,7 @@ int Schedule_Perst_SelectAll(schedule_list_t list)//ÔØÈëÈ«²¿Ñİ³ö¼Æ»®
 
 
 
-int Schedule_Perst_SelectByID(int ID, schedule_t *buf)//¸ù¾İIDÔØÈëÑİ³ö¼Æ»® 
+int Schedule_Perst_SelectByID(int ID, schedule_t *buf)//ï¿½ï¿½ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½ï¿½İ³ï¿½ï¿½Æ»ï¿½ 
 {
 	assert(NULL != buf);
 
@@ -178,7 +178,7 @@ int Schedule_Perst_SelectByID(int ID, schedule_t *buf)//¸ù¾İIDÔØÈëÑİ³ö¼Æ»®
 
 
 
-int Schedule_Perst_Update( schedule_t *data)//¸üĞÂĞÂÑİ³ö¼Æ»®
+int Schedule_Perst_Update( schedule_t *data)//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ³ï¿½ï¿½Æ»ï¿½
 {
 	assert(NULL!=data);
 
@@ -211,7 +211,7 @@ int Schedule_Perst_Update( schedule_t *data)//¸üĞÂĞÂÑİ³ö¼Æ»®
 
 
 
-int Schedule_Perst_RemByID(int ID)//¸ù¾İIDÈ¥³ıÑİ³ö¼Æ»®
+int Schedule_Perst_RemByID(int ID)//ï¿½ï¿½ï¿½ï¿½IDÈ¥ï¿½ï¿½ï¿½İ³ï¿½ï¿½Æ»ï¿½
 {
 	if(rename(SCHEDULE_DATA_FILE, SCHEDULE_DATA_TEMP_FILE)<0){
 		printf("Cannot open file %s!\n",SCHEDULE_DATA_FILE);
@@ -252,4 +252,21 @@ int Schedule_Perst_RemByID(int ID)//¸ù¾İIDÈ¥³ıÑİ³ö¼Æ»®
 		return found;
 }
 
+int Schedule_Perst_SelectByPlayID(int playID, schedule_t *schedule) {
+    FILE *fp;
+    fp = fopen("schedule.dat", "rb");
+    if (fp == NULL) {
+        printf("æ— æ³•æ‰“å¼€æ–‡ä»¶\n");
+        return 0;
+    }
 
+    while (fread(schedule, sizeof(schedule_t), 1, fp) == 1) {
+        if (schedule->play_id == playID) {
+            fclose(fp);
+            return 1; // æ‰¾åˆ°åŒ¹é…å‰§ç›®IDçš„æ¼”å‡ºè®¡åˆ’æ•°æ®
+        }
+    }
+
+    fclose(fp);
+    return 0; // æœªæ‰¾åˆ°åŒ¹é…å‰§ç›®IDçš„æ¼”å‡ºè®¡åˆ’æ•°æ®
+}

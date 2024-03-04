@@ -11,70 +11,70 @@
 
 
 
-int Ticket_Srv_StatRevSchID(int schedule_id,int *soldCount)//¸ù¾ÝÑÝ³ö¼Æ»®ID»ñÈ¡Æ±·¿
+int Ticket_Srv_StatRevSchID(int schedule_id,int *soldCount)//ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½IDï¿½ï¿½È¡Æ±ï¿½ï¿½
 {
-	int value = 0;//´æ·ÅÆ±·¿
+	int value = 0;//ï¿½ï¿½ï¿½Æ±ï¿½ï¿½
 	ticket_list_t list;
 	ticket_node_t *p;
 	int Sale_bool;
 	sale_t sale;//Æ± 
-	List_Init(list,ticket_node_t);//³õÊ¼»¯Á´±í 
-	*soldCount = 0;//ÓÐÐ§ÊÛÆ±ÊÒÊýÁ¿
-	*soldCount = Ticket_Srv_FetchBySchID(list,schedule_id);//¸ù¾ÝÑÝ³ö¼Æ»®ID»ñÈ¡Æ±·¿Êý¾Ý 
-	List_ForEach(list,p)//±éÀú 
+	List_Init(list,ticket_node_t);//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+	*soldCount = 0;//ï¿½ï¿½Ð§ï¿½ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	*soldCount = Ticket_Srv_FetchBySchID(list,schedule_id);//ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½IDï¿½ï¿½È¡Æ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+	List_ForEach(list,p)//ï¿½ï¿½ï¿½ï¿½ 
 	{
-		Sale_bool = Sale_Srv_FetchByticket(p->data.id,&sale);//¸ù¾ÝÆ±ID»ñÈ¡ÏúÊÛ¼ÇÂ¼ 
+		Sale_bool = Sale_Srv_FetchByticket(p->data.id,&sale);//ï¿½ï¿½ï¿½ï¿½Æ±IDï¿½ï¿½È¡ï¿½ï¿½ï¿½Û¼ï¿½Â¼ 
 		//sale.type = 1;
-		if(sale.type == 1 && p->data.status == 1)//È·ÈÏÎªÂòÆ±×´Ì¬£¬ÔÙÈ·ÈÏÎªÒÑÊÛ
+		if(sale.type == 1 && p->data.status == 1)//È·ï¿½ï¿½Îªï¿½ï¿½Æ±×´Ì¬ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½
 		{
 			*soldCount++;
 			value +=  p->data.price;
 		}
 	}
 
-	List_Destroy(list,ticket_node_t);//Ïú»ÙÁ´±í 
+	List_Destroy(list,ticket_node_t);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
 	return value;
 }
 
 int Ticket_Srv_FetchBySchID(ticket_list_t list, int schedule_id)
 {
-	return Ticket_Perst_SelectBySchID(list,schedule_id);////¸ù¾ÝÑÝ³ö¼Æ»®IDÔØÈëÆ±·¿Êý¾Ý
+	return Ticket_Perst_SelectBySchID(list,schedule_id);////ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½IDï¿½ï¿½ï¿½ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 }
 
-//Éú³ÉÑÝ³öÆ±·þÎñ 
+//ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ 
 int Ticket_Srv_GenBatch(int schedule_id, int studio_id)
 {
 	seat_list_t list;
 	list = (seat_node_t*)malloc(sizeof(seat_node_t));
-	List_Init(list,seat_node_t);//³õÊ¼»¯Á´±í 
+	List_Init(list,seat_node_t);//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
 	Seat_Srv_FetchValidByRoomID(list,studio_id);
 	  int cnt = Ticket_Perst_Insert(schedule_id,list);
 	if(cnt > 0)
 	{
-		printf("³É¹¦Éú³ÉÆ±!\n");
+		printf("ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½Æ±!\n");
 	}
 	else
 	{
-		printf("Éú³ÉÆ±Ê§°Ü!\n");
+		printf("ï¿½ï¿½ï¿½ï¿½Æ±Ê§ï¿½ï¿½!\n");
 	}
 	
 	return cnt;
 }
 
-//¸ù¾ÝÑÝ³ö¼Æ»®IDÉ¾³ýÑÝ³öÆ±·þÎñ 
+//ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½IDÉ¾ï¿½ï¿½ï¿½Ý³ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ 
 int Ticket_Srv_DeleteBatch(int schedule_id) 
 {
-	return Ticket_Perst_Rem(schedule_id);//¸ù¾ÝÑÝ³ö¼Æ»®IDÈ¥³ýÑÝ³öÆ± 
+	return Ticket_Perst_Rem(schedule_id);//ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½IDÈ¥ï¿½ï¿½ï¿½Ý³ï¿½Æ± 
 }
 
-//»ñÈ¡È«²¿ÑÝ³öÆ±·þÎñ 
+//ï¿½ï¿½È¡È«ï¿½ï¿½ï¿½Ý³ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ 
 int Ticket_Srv_FetchAll(ticket_list_t ticket_list)
 {
-	return Ticket_Perst_SelectAll(ticket_list);//ÔØÈëÈ«²¿ÑÝ³öÆ± 
+	return Ticket_Perst_SelectAll(ticket_list);//ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½Ý³ï¿½Æ± 
 }
 
-//¸ù¾ÝID»ñÈ¡ÑÝ³öÆ±·þÎñ 
-ticket_list_t Ticket_Srv_FetchByID (int id,ticket_list_t buf)//id ÊÇÊ²Ã´id
+//ï¿½ï¿½ï¿½ï¿½IDï¿½ï¿½È¡ï¿½Ý³ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ 
+ticket_list_t Ticket_Srv_FetchByID (int id,ticket_list_t buf)//id ï¿½ï¿½Ê²Ã´id
 {
 	ticket_list_t p;
 	List_ForEach(buf,p)
@@ -85,3 +85,47 @@ ticket_list_t Ticket_Srv_FetchByID (int id,ticket_list_t buf)//id ÊÇÊ²Ã´id
 	return NULL;
 	
 }
+
+ticket_list_t Ticket_Srv_FetchByID (int id,ticket_list_t buf)//id ï¿½ï¿½Ê²Ã´id
+{
+	ticket_list_t p;
+	List_ForEach(buf,p)
+	{
+		if(p->data.seat_id == id)
+		return p;
+	}
+	return NULL;
+	
+}
+int Ticket_Srv_Modify (const ticket_t *data){
+
+	return Ticket_Perst_Update(data);
+}
+
+
+//??????????ID??????????
+int Ticket_Srv_FetchBySchID(ticket_list_t list, int schedule_id)
+{
+	return Ticket_Perst_SelectBySchID(list,schedule_id);
+
+}
+
+
+//????ID????
+ticket_node_t * Ticket_Srv_FetchBySeatID (ticket_list_t list, int seat_id)
+{
+	ticket_node_t* p;
+	List_ForEach(list,p)
+	{
+			if(p->data.seat_id == seat_id) return p;
+	}
+	return NULL;
+}
+
+int Ticket_Srv_FetchBySchID(ticket_list_t list, int schedule_id)
+{
+	return Ticket_Perst_SelectBySchID(list,schedule_id);
+
+}
+
+

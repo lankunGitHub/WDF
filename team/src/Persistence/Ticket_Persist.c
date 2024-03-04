@@ -15,7 +15,7 @@ static const char TICKET_DATA_TEMP_FILE[]="TicketTemp.dat";
 static const char TICKET_KEY_NAME[]="Ticket";
 
 
-int Ticket_Perst_SelectBySchID(ticket_list_t list, int schedule_id)//¸ù¾ÝÑÝ³ö¼Æ»®IDÔØÈëÆ±·¿Êý¾Ý
+int Ticket_Perst_SelectBySchID(ticket_list_t list, int schedule_id)//ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½IDï¿½ï¿½ï¿½ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 {
 	assert(NULL!= list);
 
@@ -51,12 +51,12 @@ int Ticket_Perst_SelectBySchID(ticket_list_t list, int schedule_id)//¸ù¾ÝÑÝ³ö¼Æ»
 }
 
 
-//´æ´¢ÑÝ³öÆ± 
+//ï¿½æ´¢ï¿½Ý³ï¿½Æ± 
 int Ticket_Perst_Insert(int schedule_id,seat_list_t list)
 {
 	int cnt = 0;
 	FILE *fp = fopen(TICKET_DATA_FILE,"ab");
-	if(!fp) printf("´ò¿ªÊ§°Ü%s",TICKET_DATA_FILE);
+	if(!fp) printf("ï¿½ï¿½Ê§ï¿½ï¿½%s",TICKET_DATA_FILE);
 
 	schedule_t buf;
 	Schedule_Perst_SelectByID(schedule_id,&buf);
@@ -83,7 +83,7 @@ int Ticket_Perst_Insert(int schedule_id,seat_list_t list)
 }
 
 
-int Ticket_Perst_Rem(int schedule_id)//¸ù¾ÝÑÝ³ö¼Æ»®ID»ñÈ¡ÑÝ³öÆ± 
+int Ticket_Perst_Rem(int schedule_id)//ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½IDï¿½ï¿½È¡ï¿½Ý³ï¿½Æ± 
 {
 	if(rename(TICKET_DATA_FILE, TICKET_DATA_TEMP_FILE)<0){
 		printf("Cannot open file %s!\n", TICKET_DATA_FILE);
@@ -127,7 +127,7 @@ int Ticket_Perst_Rem(int schedule_id)//¸ù¾ÝÑÝ³ö¼Æ»®ID»ñÈ¡ÑÝ³öÆ±
 
 
 
-int Ticket_Perst_SelectAll(ticket_list_t ticket_list)//ÔØÈëÈ«²¿ÑÝ³öÆ± 
+int Ticket_Perst_SelectAll(ticket_list_t ticket_list)//ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½Ý³ï¿½Æ± 
 {
 	ticket_node_t *newNode;
 	ticket_t data;
@@ -161,3 +161,60 @@ int Ticket_Perst_SelectAll(ticket_list_t ticket_list)//ÔØÈëÈ«²¿ÑÝ³öÆ±
 
 }
 
+int Ticket_Perst_Update (const ticket_t *data){
+	assert(NULL!=data);
+
+	FILE *fp = fopen(TICKET_DATA_FILE, "rb+");
+	if (NULL == fp) {
+		printf("Cannot open file %s!\n", TICKET_DATA_FILE);
+		return 0;
+	}
+
+	ticket_t buf;
+	int found = 0;
+
+	while (!feof(fp)) {
+		if (fread(&buf, sizeof(ticket_t), 1, fp)) {
+			if (buf.id == data->id) {
+				fseek(fp, -((int)sizeof(ticket_t)), SEEK_CUR);
+				fwrite(data, sizeof(ticket_t), 1, fp);
+				// printf("status = %d\n",data->status);
+				found = 1;
+				break;
+			}
+
+		}
+	}
+	fclose(fp);
+
+	return found;
+}
+
+int Ticket_Perst_SelByID(int id, ticket_t *buf)
+{//ï¿½ï¿½Î»id
+	assert(NULL!=buf);
+
+	FILE *fp = fopen(TICKET_DATA_FILE, "rb");
+	if (NULL == fp) {
+		return 0;
+	}
+
+	ticket_t data;
+	int found = 0;
+
+	while (!feof(fp)) {
+		if (fread(&data, sizeof(ticket_t), 1, fp)) {
+			if (id == data.seat_id)
+			 {
+				*buf = data;
+				found = 1;
+				break;
+			}
+
+		}
+	}
+	fclose(fp);
+
+	return found;
+	
+}

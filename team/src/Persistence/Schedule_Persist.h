@@ -13,8 +13,9 @@ int Schedule_Perst_RemByID(int ID);
 
 int Schedule_Perst_SelectByID(int ID, schedule_t *buf);
 
-int Schedule_Perst_SelectAll(schedule_list_t list);//ÔØÈëËùÓÐÑÝ³ö¼Æ»® 
+int Schedule_Perst_SelectAll(schedule_list_t list);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½ 
 
-int Schedule_Perst_SelectByPlay(schedule_list_t buf, int play_id);//¸ù¾Ý¾çÄ¿IDÔØÈëÑÝ³ö¼Æ»® 
+int Schedule_Perst_SelectByPlay(schedule_list_t buf, int play_id);//ï¿½ï¿½ï¿½Ý¾ï¿½Ä¿IDï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½Æ»ï¿½ 
 
+int Schedule_Perst_SelectByPlayID(int playID, schedule_t *schedule);
 #endif // SCHEDPERSIST_H_

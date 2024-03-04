@@ -2,7 +2,70 @@
 #include "../Persistence/Ticket_Persist.h"
 #include "../Common/List.h"
 
-int Sale_Srv_FetchByticket(int ticket_id,sale_t *sale)//¸ù¾ÝÆ±ID»ñÈ¡ÏúÊÛ¼ÇÂ¼ 
+int Sale_Srv_FetchByticket(int ticket_id,sale_t *sale)//ï¿½ï¿½ï¿½ï¿½Æ±IDï¿½ï¿½È¡ï¿½ï¿½ï¿½Û¼ï¿½Â¼ 
 {
 	return Sale_Perst_SelByTicketID(ticket_id,sale);
+}
+
+
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½Æ± 
+int Sale_Srv_Add(sale_t *data){
+	return Sale_Perst_Insert(data);
+
+}
+
+//ï¿½Þ¸ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ 
+int Ticket_Srv_Modify (const ticket_t *data){
+
+	return Ticket_Perst_Update(data);
+}
+
+
+//??????????ID??????????
+int Ticket_Srv_FetchBySchID(ticket_list_t list, int schedule_id)
+{
+	return Ticket_Perst_SelectBySchID(list,schedule_id);
+
+}
+
+
+//????ID????
+ticket_node_t * Ticket_Srv_FetchBySeatID (ticket_list_t list, int seat_id)
+{
+	ticket_node_t* p;
+	List_ForEach(list,p)
+	{
+			if(p->data.seat_id == seat_id) return p;
+	}
+	return NULL;
+}
+
+int Sale_Srv_FetchAll(sale_list_t list){
+	int i;
+	i=Sale_Perst_SelectAll(list);
+	return i;
+}
+//ï¿½ï¿½ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½Æ± 
+int Sale_Srv_FetchByticket(int ticket_id,sale_t *sale)//+
+{
+	// return 0;
+	return Sale_Perst_SelByTicketID(ticket_id,sale);
+}
+
+int Ticket_Srv_FetchBySchID2(ticket_list_t  list,int schedule_id)
+{
+	int  count  = 0;
+	List_Free(list,ticket_node_t);
+	count = Ticket_Perst_SelectBySchID(list,schedule_id);
+	return count;
+}
+
+int Sale_Srv_Add(sale_t *data){
+	return Sale_Perst_Insert(data);
+
+}
+
+int Sale_Srv_Add(sale_t *data){
+	return Sale_Perst_Insert(data);
+
 }
