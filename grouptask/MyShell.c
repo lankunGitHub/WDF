@@ -1,26 +1,26 @@
 #include <sys/types.h>
-#include<>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <signal.h>
 #include <unistd.h>
-#include<stdbool.h>
+#include <stdbool.h>
+#include <fcntl.h>
 
 #define MAX_LINE 256
 #define MAX_COMMAND 20
-#define INTERNAL_COMMAND_NUM 4
-#define PIPE_CUTTING "|"
-#define REDIRCT_CUTTING " "
+#define INTERNAL_COMMAND_NUM 3
+#define PIPE_CUTTING "|\n\r"
+#define REDIRCT_CUTTING " '"
 
 typedef struct
 {
     char command[MAX_COMMAND];
-    char** args;
+    char **args;
     int Internal;
-    char* infile;
-    char* outfile;
+    char *infile;
+    char *outfile;
     bool addfile;
     int background;
 } Command;
@@ -31,82 +31,157 @@ typedef struct Command_node
     struct Command_node *next;
 } Command_list_t, Command_node_t;
 
-int Myshell_Cd(Command_node_t args)
+int Myshell_Cd(Command_node_t *node)
 {
-    chdir(path);
-
+    if (chdir(node->data.args[1]) != 0)
+        perror("cd failed");
 }
-int Myshell_Exit(Command_node_t args)
+int Myshell_Exit(Command_node_t *node)
 {
-    return 0;
+    int status;
+    printf("Good Bye\n");
 }
-int Myshell_Echo(Command_node_t args)
-int Myshell_Pwd(Command_node_t args)
+int Myshell_Pwd(Command_node_t *node)
 {
     char buf[MAX_LINE];
     getcwd(buf, MAX_LINE);
-    printf("%s\n",buf);
+    printf("%s\n", buf);
 }
-
-int (*Internal_Command_Func[])(Command_node_t) =
+void sigint_handler(int signum) 
 {
-    &Myshell_Cd,
-    &Myshell_Echo,
-    &Myshell_Exit,
-    &Myshell_Pwd
-};
-char* Internal_Command_Cmd[] = 
-{
-    "cd",
-    "echo",
-    "exit",
-    "pwd"
+    printf("\033[1;34m\nGood Bye╰(●’◡’●)╮\n");
+    exit(1);
 }
-
-int Myshell_Command_Exec(Command_list_t head,int count)
-{
-    int pipe[count-1][2];
-    pid_t pid;
-    for(int i=0;i<count-2;i++)
+int (*Internal_Command_Func[])(Command_node_t *) =
     {
-        if (pipe(pipes[i]) == -1) 
+        &Myshell_Cd,
+        &Myshell_Exit,
+        &Myshell_Pwd};
+char *Internal_Command_Cmd[] =
+    {
+        "cd",
+        "exit",
+        "pwd"};
+static sigset_t curMask;
+static int emo_flag = 0;
+
+int Myshell_Command_Exec(Command_list_t *head, int count)
+{
+
+    pid_t pid;
+    int pipes[count - 1][2];
+    for (int i = 0; i < count - 1; i++)
+    {
+        if (pipe(pipes[i]) == -1)
         {
             perror("pipe");
             return 1;
         }
     }
-
-    for(int i=0;i<count;i++)
+    Command_node_t *temp = head->next;
+    for (int i = 0; i < count; i++)
     {
-        if(i == 0)
-        {
-
-        }
         pid = fork();
-        if(pid < 0)
+        if (pid < 0)
         {
             perror("fork");
             return 1;
         }
-        else if(pid == 0)
+        else if (pid == 0)
         {
-            if(head->data.inflie)
+            sigset_t oldMask;
+            sigprocmask(SIG_UNBLOCK, &curMask, &oldMask);
+            if (count - 1 > 0)
             {
-                
+                if (i == 0)
+                {
+                    close(pipes[i][0]);
+                    dup2(pipes[i][1], STDOUT_FILENO);
+                    close(pipes[i][1]);
+                }
+                else if (i == count - 1)
+                {
+                    close(pipes[i - 1][1]);
+                    dup2(pipes[i - 1][0], STDIN_FILENO);
+                    close(pipes[i - 1][0]);
+                }
+                else
+                {
+                    close(pipes[i - 1][1]);
+                    dup2(pipes[i - 1][0], STDIN_FILENO);
+                    close(pipes[i -1][0]);
+                    close(pipes[i][0]);
+                    dup2(pipes[i][1], STDOUT_FILENO);
+                    close(pipes[i][1]);
+                }
             }
+           if (temp->data.infile)
+            {
+                int in_fd = open(temp->data.infile, O_RDONLY);
+                if (in_fd == -1)
+                {
+                    perror("open");
+                    return 1;
+                }
+                dup2(in_fd, STDIN_FILENO);
+                close(in_fd);
+            }
+            if (temp->data.outfile)
+            {
+                if (temp->data.addfile)
+                {
+                    int out_fd = open(temp->data.outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
+                    if (out_fd == -1)
+                    {
+                        perror("open");
+                        return 1;
+                    }
+                    dup2(out_fd, STDOUT_FILENO);
+                    close(out_fd);
+                }
+                else
+                {
+                    int out_fd = open(temp->data.outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+                    if (out_fd == -1)
+                    {
+                        perror("open");
+                        return 1;
+                    }
+                    dup2(out_fd, STDOUT_FILENO);
+                    close(out_fd);
+                }
+            }
+            for (int j = 0; j < INTERNAL_COMMAND_NUM; j++)
+            {
+                if (!strcmp(temp->data.command, Internal_Command_Cmd[j]))
+                {
+                    return Internal_Command_Func[j](temp);
+                }
+            }
+            emo_flag = execvp(temp->data.command, temp->data.args);
+            perror(" \033[1;31m(╯#-_-)╯~~~~~~~~~~~~~~~~~╧═╧ \nexecvp failed");
+            return -1;
         }
+        else
+        {
+            if(count -1>0)
+            close(pipes[i][1]);
+            wait(NULL);
+        }
+        temp = temp->next;
     }
+    if(count -1 > 0)
+    for(int i=0;i<count-1;i++)
+        close(pipes[i][0]);
+    return 1;
 }
 
-
-
-int Myshell_Command_Cutting(Command_list_t *head)
+int Myshell_Command_Cutting(Command_list_t *head, char *line)
 {
     int pipecount = 0;
     Command_list_t *temp = head;
-    char *token, **buf, *line;
-    line = malloc(sizeof(char) * MAX_LINE);
-    fgets(line, MAX_LINE, stdin);
+    char *token;
     char **tokens = malloc(sizeof(char *) * MAX_COMMAND);
     token = strtok(line, PIPE_CUTTING);
     while (token)
@@ -139,13 +214,18 @@ int Myshell_Command_Cutting(Command_list_t *head)
                 node->data.outfile = token;
                 node->data.args[--k] = NULL;
             }
-            else if(k != 0 && !strcmp(node->data.args[k - 1], ">>"))
+            else if (k != 0 && !strcmp(node->data.args[k - 1], ">>"))
             {
+                if (node->data.outfile != NULL)
+                {
+                    printf("You can't redirect output more than once\n");
+                    return -1;
+                }
                 node->data.outfile = token;
                 node->data.args[--k] = NULL;
                 node->data.addfile = true;
             }
-            else if(k != 0 && strcmp(node->data.args[k - 1],"&"))
+            else if (k != 0 && !strcmp(node->data.args[k - 1], "&"))
             {
                 countback++;
                 node->data.background = true;
@@ -153,51 +233,76 @@ int Myshell_Command_Cutting(Command_list_t *head)
             }
             else
             {
-                node->data.args[k] = token;
-                k++;
+                node->data.args[k++] = token;
+                // printf("%s    %d\n",node->data.args[k-1],k-1);
             }
             token = strtok(NULL, REDIRCT_CUTTING);
         }
-        strcpy(node->data.command , node->data.args[0]);
+        node->data.args[k] = NULL;
+        strcpy(node->data.command, node->data.args[0]);
         temp->next = node;
-        node->prev = temp;
         temp = node;
     }
+    // printf("hhh\n");
     temp->next = NULL;
     head->data.background = countback;
     return pipecount;
 }
 
-
-
-
 int main(int argc, char *argv[])
 {
-    sigset_t curMask;
+    if (signal(SIGQUIT, sigint_handler) == SIG_ERR) 
+    {
+        perror("Error setting SIGINT handler");
+        return 1;
+    }
+
     sigemptyset(&curMask);
     sigaddset(&curMask, SIGINT);
     sigprocmask(SIG_BLOCK, &curMask, NULL);
     do
     {
         int count;
-        char workdir[MAX_LINE];
+        // char workdir[MAX_LINE];
         char name[MAX_LINE];
         getlogin_r(name, MAX_LINE);
-        getcwd(workdir, MAX_LINE);
-        printf("%s@%s $", name, workdir);
+        // getcwd(workdir, MAX_LINE);
+        if (emo_flag == -1)
+        {
+            printf("\n\033[1;31m%s@( ┬＿┬ )$\033[0m", name);
+            emo_flag = 0;
+        }
+        else
+            printf("\n\033[1;32m%s@(⊙ .⊙ )$\033[0m", name);
+        size_t linesize = MAX_LINE;
+        char *line = NULL;
+        getline(&line, &linesize, stdin);
         Command_list_t *head = malloc(sizeof(Command_list_t));
-        head->data.args = malloc(sizeof(char*) * MAX_COMMAND);
+        head->data.args = malloc(sizeof(char *) * MAX_COMMAND);
         head->next = NULL;
-        head->prev = NULL;
-        count=Myshell_Command_Cutting(head);
-        printf("%d\n",count);
-       // Myshell_Command_Exec(head->next,count);
-       for(int i=0;i<count;i++)
-       {
+        count = Myshell_Command_Cutting(head, line);
+        // printf("%d\n",count);
+        if (count != -1)
+        {
+            Myshell_Command_Exec(head, count);
+            free(line);
+            for (int i = 0; i < count; i++)
+            {
+                Command_node_t *temp = head->next;
+                free(head->data.args);
+                free(head);
+                head = temp;
+            }
+        }
+        else
+        {
+            Myshell_Command_Exec(head, 1);
+            free(line);
             Command_node_t *temp = head->next;
             free(head->data.args);
             free(head);
-            head = temp;
-       }
+            free(temp->data.args);
+            free(temp);
+        }
     } while (1);
 }
