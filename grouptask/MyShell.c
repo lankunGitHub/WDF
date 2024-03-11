@@ -10,9 +10,9 @@
 
 #define MAX_LINE 256
 #define MAX_COMMAND 20
-#define INTERNAL_COMMAND_NUM 3
+#define INTERNAL_COMMAND_NUM 2
 #define PIPE_CUTTING "|\n\r"
-#define REDIRCT_CUTTING " '"
+#define REDIRCT_CUTTING "\'\" "
 
 typedef struct
 {
@@ -35,17 +35,14 @@ int Myshell_Cd(Command_node_t *node)
 {
     if (chdir(node->data.args[1]) != 0)
         perror("cd failed");
-}
-int Myshell_Exit(Command_node_t *node)
-{
-    int status;
-    printf("Good Bye\n");
+        return 0;
 }
 int Myshell_Pwd(Command_node_t *node)
 {
     char buf[MAX_LINE];
     getcwd(buf, MAX_LINE);
     printf("%s\n", buf);
+    return 0;
 }
 void sigint_handler(int signum) 
 {
@@ -55,7 +52,6 @@ void sigint_handler(int signum)
 int (*Internal_Command_Func[])(Command_node_t *) =
     {
         &Myshell_Cd,
-        &Myshell_Exit,
         &Myshell_Pwd};
 char *Internal_Command_Cmd[] =
     {
@@ -167,10 +163,11 @@ int Myshell_Command_Exec(Command_list_t *head, int count)
         {
             if(count -1>0)
             close(pipes[i][1]);
-            wait(NULL);
         }
         temp = temp->next;
     }
+    for(int i=0;i<count;i++) wait(NULL);
+
     if(count -1 > 0)
     for(int i=0;i<count-1;i++)
         close(pipes[i][0]);
@@ -277,6 +274,12 @@ int main(int argc, char *argv[])
         size_t linesize = MAX_LINE;
         char *line = NULL;
         getline(&line, &linesize, stdin);
+        if(!strcmp(line,"exit\n"))
+        {
+            free(line);
+            printf("\033[1;34m\nGood Bye╰(●’◡’●)╮\n");
+            exit(1);
+        }
         Command_list_t *head = malloc(sizeof(Command_list_t));
         head->data.args = malloc(sizeof(char *) * MAX_COMMAND);
         head->next = NULL;
