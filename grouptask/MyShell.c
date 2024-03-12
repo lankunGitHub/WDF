@@ -30,7 +30,6 @@ typedef struct Command_node
     Command data;
     struct Command_node *next;
 } Command_list_t, Command_node_t;
-
 int Myshell_Cd(Command_node_t *node)
 {
     if (chdir(node->data.args[1]) != 0)
@@ -44,7 +43,7 @@ int Myshell_Pwd(Command_node_t *node)
     printf("%s\n", buf);
     return 0;
 }
-void sigint_handler(int signum) 
+void sigquit_handler(int signum) 
 {
     printf("\033[1;34m\nGood Bye╰(●’◡’●)╮\n");
     exit(1);
@@ -63,7 +62,7 @@ static int emo_flag = 0;
 
 int Myshell_Command_Exec(Command_list_t *head, int count)
 {
-
+    pid_t sidpid;
     pid_t pid;
     int pipes[count - 1][2];
     for (int i = 0; i < count - 1; i++)
@@ -87,6 +86,18 @@ int Myshell_Command_Exec(Command_list_t *head, int count)
         {
             sigset_t oldMask;
             sigprocmask(SIG_UNBLOCK, &curMask, &oldMask);
+            if(temp->data.background)
+            {
+                if(temp->data.background == 1)
+                {
+                    printf("[%d %s]  ",temp->data.background,temp->data.command);
+                    sidpid = setsid();
+                }
+                else
+                {
+                    setpgid(pid,sidpid);
+                }
+            }
             if (count - 1 > 0)
             {
                 if (i == 0)
@@ -161,13 +172,17 @@ int Myshell_Command_Exec(Command_list_t *head, int count)
         }
         else
         {
+            if(temp->data.background == 1) sidpid = pid;
             if(count -1>0)
             close(pipes[i][1]);
         }
         temp = temp->next;
     }
-    for(int i=0;i<count;i++) wait(NULL);
-
+    for(int i=0;i<count -head->data.background;i++)
+    {
+        int status;
+        waitpid(pid, &status, 0);
+    }
     if(count -1 > 0)
     for(int i=0;i<count-1;i++)
         close(pipes[i][0]);
@@ -203,11 +218,21 @@ int Myshell_Command_Cutting(Command_list_t *head, char *line)
         {
             if (k != 0 && !strcmp(node->data.args[k - 1], "<"))
             {
+                if (node->data.infile != NULL)
+                {
+                    printf("\033[1;31mYou can't redirect input more than once\033[0m\n");
+                    return -1;
+                }
                 node->data.infile = token;
                 node->data.args[--k] = NULL;
             }
             else if (k != 0 && !strcmp(node->data.args[k - 1], ">"))
             {
+                if (node->data.outfile != NULL)
+                {
+                    printf("\033[1;31mYou can't redirect output more than once\033[0m\n");
+                    return -1;
+                }
                 node->data.outfile = token;
                 node->data.args[--k] = NULL;
             }
@@ -215,18 +240,16 @@ int Myshell_Command_Cutting(Command_list_t *head, char *line)
             {
                 if (node->data.outfile != NULL)
                 {
-                    printf("You can't redirect output more than once\n");
+                    printf("\033[1;31mYou can't redirect output more than once\033[0m\n");
                     return -1;
                 }
                 node->data.outfile = token;
                 node->data.args[--k] = NULL;
                 node->data.addfile = true;
             }
-            else if (k != 0 && !strcmp(node->data.args[k - 1], "&"))
+            else if (k != 0 && !strcmp(token, "&"))
             {
-                countback++;
-                node->data.background = true;
-                node->data.args[--k] = NULL;
+                node->data.background = countback++;
             }
             else
             {
@@ -248,17 +271,18 @@ int Myshell_Command_Cutting(Command_list_t *head, char *line)
 
 int main(int argc, char *argv[])
 {
-    if (signal(SIGQUIT, sigint_handler) == SIG_ERR) 
+    if (signal(SIGQUIT, sigquit_handler) == SIG_ERR) 
     {
-        perror("Error setting SIGINT handler");
+        perror("signal");
         return 1;
     }
-
     sigemptyset(&curMask);
     sigaddset(&curMask, SIGINT);
     sigprocmask(SIG_BLOCK, &curMask, NULL);
+    int status;
     do
     {
+        waitpid(-1, &status, WNOHANG);
         int count;
         // char workdir[MAX_LINE];
         char name[MAX_LINE];
@@ -280,14 +304,17 @@ int main(int argc, char *argv[])
             printf("\033[1;34m\nGood Bye╰(●’◡’●)╮\n");
             exit(1);
         }
+        waitpid(-1, &status, WNOHANG);
         Command_list_t *head = malloc(sizeof(Command_list_t));
         head->data.args = malloc(sizeof(char *) * MAX_COMMAND);
         head->next = NULL;
         count = Myshell_Command_Cutting(head, line);
+        waitpid(-1, &status, WNOHANG);
         // printf("%d\n",count);
         if (count != -1)
         {
             Myshell_Command_Exec(head, count);
+            waitpid(-1, &status, WNOHANG);
             free(line);
             for (int i = 0; i < count; i++)
             {
