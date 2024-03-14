@@ -30,6 +30,9 @@ typedef struct Command_node
     Command data;
     struct Command_node *next;
 } Command_list_t, Command_node_t;
+static sigset_t curMask;
+static int emo_flag = 0,sigint_flag = 0;
+
 int Myshell_Cd(Command_node_t *node)
 {
     if (chdir(node->data.args[1]) != 0)
@@ -55,11 +58,7 @@ int (*Internal_Command_Func[])(Command_node_t *) =
 char *Internal_Command_Cmd[] =
     {
         "cd",
-        "exit",
         "pwd"};
-static sigset_t curMask;
-static int emo_flag = 0;
-
 int Myshell_Command_Exec(Command_list_t *head, int count)
 {
     pid_t sidpid;
@@ -166,9 +165,9 @@ int Myshell_Command_Exec(Command_list_t *head, int count)
                     return Internal_Command_Func[j](temp);
                 }
             }
-            emo_flag = execvp(temp->data.command, temp->data.args);
-            perror(" \033[1;31m(╯#-_-)╯~~~~~~~~~~~~~~~~~╧═╧ \nexecvp failed");
-            return -1;
+            execvp(temp->data.command, temp->data.args);
+            printf(" \033[1;31m(╯#-_-)╯~~~~~~~~~~~~~~~~~╧═╧ \ncommand not found: %s\033[33m",temp->data.command);
+            exit(EXIT_FAILURE);
         }
         else
         {
@@ -182,6 +181,12 @@ int Myshell_Command_Exec(Command_list_t *head, int count)
     {
         int status;
         waitpid(pid, &status, 0);
+      //  printf("%dhhhhhh\n",status);
+        if (status) 
+        {
+            emo_flag  = -1;
+            //printf("%dhhh\n",WIFEXITED(status));
+        }
     }
     if(count -1 > 0)
     for(int i=0;i<count-1;i++)
@@ -303,6 +308,11 @@ int main(int argc, char *argv[])
             free(line);
             printf("\033[1;34m\nGood Bye╰(●’◡’●)╮\n");
             exit(1);
+        }
+        if(sigint_flag) 
+        {
+            sigint_flag = 0;
+            continue;
         }
         waitpid(-1, &status, WNOHANG);
         Command_list_t *head = malloc(sizeof(Command_list_t));
