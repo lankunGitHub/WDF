@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My first page</title>
+</head>
+
+<body>
+    <h1>标题</h1>
+    <h3>字体变换</h3>
+    <strong>加粗</strong>
+    <br />换行
+    <em>倾斜</em>
+    <del>删除线</del>
+    <ins>下划线</ins>
+    <br />
+    <br />
+    <br />
+    <h3>盒子</h3>
+    <div>div标签，用来布局，单独占一行</div>
+    <span>span标签，用来布局，一行可以多个</span>
+    <br />
+    <br />
+    <br />
+    <h3 id="图片">图像标签</h3>
+    <img src="img_src/images.jpeg" /><br />
+    <h4>alt标签</h4>
+    <img src="../../Pictures/images.jpeg" alt="alt标签，若图片无法正常使用，则显示该文字" /><br />
+    <h4>title标签</h4>
+    <img src="img_src/images.jpeg" title="title标签，鼠标在图片上显示文字" /><br />
+    <h4>width和height标签</h4>
+    <img src="img_src/images.jpeg" width="1080" height="720" /><br />
+    <h4>border标签</h4>
+    <img src="img_src/images.jpeg" border="15" /><br />
+    <br />
+    <br />
+    <br />
+    <h3>超链接</h3>
+    <h4>外部链接</h4>target标签_self替换当前页面打开，_blank新窗口打开
+    <a href="https://www.bilibili.com/" target="_blank">bilbil</a>
+    <h4>内部连接</h4>
+    <a href="task.html">内部连接</a>
+    <h4>空链接</h4>
+    <a href="#">空连接</a>
+    <h4>下载链接</h4>
+    <a href=""></a>
+    <h4>网页元素超链接</h4>
+    <a href="https://www.bilibili.com/"><img src="img_src/images.jpeg" /></a>
+    <h4>锚点链接</h4>
+    <a href="#图片">图片</a>
+    <br />
+    <br />
+    <br />
+    <h3>表格</h3>
+    <table align="center" border="1" cellpadding="20" cellspacing="0" width="500" height="500">
+        <thead>
+            <tr>
+                <th>th标签</th>
+                <th>表头单元格，居中加粗</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>td标签</td>
+                <td>表示行的单元元素</td>
+            </tr>
+            <tr>
+                <td>tr标签</td>
+                <td>生成行</td>
+            </tr>
+        </tbody>
+    </table>
+    <h4>跨行跨列合并单元格</h4>
+    <table align="center" border="1" cellpadding="20" cellspacing="0">
+        <tbody>
+            <tr>
+                <td>
+
+                </td>
+                <td colspan="2">
+
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="2">
+
+                </td>
+                <td>
+
+                </td>
+                <td>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+
+                </td>
+                <td>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>列表</h3>
+    <h4>无序列表</h4>
+    <ul>
+        <li>无</li>
+        <li>序</li>
+        <li>列</li>
+        <li>表</li>
+    </ul>
+    <h4>有序列表</h4>
+    <ol>
+        <li>有</li>
+        <li>序</li>
+        <li>列</li>
+        <li>表</li>
+    </ol>
+    <h4>自定义列表</h4>
+    <dl>
+        <dt>自定义列表</dt>
+        <dd>下一级解释</dd>
+    </dl>
+    <br/>
+    <br/>
+    <br/>
+    <h4>表单列表</h4>
+    <form action="提交对象" method="提交方式" name="表单域名">
+        用户名：<input type="text" name="username" value="请输入用户名" maxlength="6"/>  <br/>
+        密码：<input type="password" name="pass"/> <br/>
+        性别：<input type="radio" name="male" value="女" checked="checked"> 女 <input type="radio" name="male" value="男"> 男 <br/>
+        爱好：<input type="checkbox" name="1"> <input type="checkbox" name="1"> <input type="checkbox" name="1">
+        <br/>
+        <input type="submit" value="提交"/> <br/>
+        <input type="reset" value="重置"> <br/>
+        <input type="button" value="输入"> <br/>
+        <input type="file" value="选择文件"> <br/>
+        序号：<select>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+        </select>  <br/>
+        意见：<textarea rows="4" cols="20"></textarea>
+    </form>
+    <h4>lable标签</h4>
+    <form>
+        <label for="text">用户名</label><input type="text" id="text">
+    </form>
+</body>
+
+</html>
