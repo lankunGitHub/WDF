@@ -1,0 +1,4 @@
+/home/lk/netPlan/built/CMakeFiles/client.out.dir
+/home/lk/netPlan/built/CMakeFiles/server.out.dir
+/home/lk/netPlan/built/CMakeFiles/edit_cache.dir
+/home/lk/netPlan/built/CMakeFiles/rebuild_cache.dir
