@@ -198,3 +198,99 @@ markdown
 | COALESCE()          | 返回参数列表中的第一个非NULL值                                 |
 | NULLIF()            | 如果两个表达式相等，则返回NULL；否则返回第一个表达式的值       |
 <br>
+
+****
+
+# 约束
+**主键约束 (PRIMARY KEY)：**
+
+主键是用于唯一标识表中每一行的列或列组合。
+主键保证表中的每一行都有唯一的标识。
+主键列不能包含空值。
+一个表只能有一个主键。
+
+**唯一约束 (UNIQUE)：**
+
+唯一约束确保列中的所有值都是唯一的，但允许包含空值。
+与主键不同，唯一约束可以包含空值。
+一个表可以有多个唯一约束。
+
+**外键约束 (FOREIGN KEY)：**
+
+外键约束用于定义表与表之间的关系。
+外键约束确保一个表中的数据必须与另一个表中的数据匹配。
+外键通常指向另一个表中的主键或唯一约束。
+外键有助于维护数据的完整性和一致性。
+
+添加外键<br>
+ALTER TABLE 子表名称
+ADD CONSTRAINT 外键约束名称
+FOREIGN KEY (外键列名称) 
+REFERENCES 父表名称(父表主键或唯一约束列名称) on update 外键行为 on delete 外键行为;<br>
+删除外键<br>
+ALTER TABLE 表名 DROP FOREIGN KEY 外键名<br>
+
+| 外键行为         | 描述                                                         |
+|----------------|------------------------------------------------------------|
+| CASCADE        | 当父表中的记录被删除或更新时，相关的子表中的记录也会被相应地删除或更新。 |
+| SET NULL       | 当父表中的记录被删除或更新时，子表中相关的外键列会被设置为空。               |
+| RESTRICT       | 限制了在父表中的记录被删除或更新时，对子表中相关记录的影响，通常是不允许删除或更新。 |
+| NO ACTION      | 当父表中的记录被删除或更新时，不会对子表中相关的记录产生任何影响。             |
+| SET DEFAULT    | 当父表中的记录被删除或更新时，子表中相关的外键列将被设置为指定的默认值。         |
+
+**非空约束 (NOT NULL)：**
+
+非空约束指定列中的值不能为NULL。
+非空约束确保表中的数据不会缺失必要的信息。
+在插入或更新行时，如果违反了非空约束，则会引发错误。
+
+**默认约束 (DEFAULT)：**
+
+默认约束指定了列的默认值，当插入新行时，如果未提供该列的值，则会使用默认值。
+默认约束可用于提供缺省值，从而简化数据插入操作。
+如果未指定默认值，则使用NULL（除非有非空约束）。
+
+**检查约束 (CHECK)：**
+
+检查约束用于限制列中的值必须满足指定的条件。
+在MySQL中，虽然不支持原生的CHECK约束，但可以通过触发器模拟实现类似的功能。
+
+<br>
+
+****
+
+# 多表查询
+
+**显式内连接**
+显式内连接
+SELECT A.col1, B.col2
+FROM table1 A INNER JOIN table2 B ON A.join_col = B.join_col;
+
+**外连接**
+左外连接（Left Outer Join）
+
+SELECT * FROM table1 LEFT JOIN table2 ON table1.column_name = table2.column_name;
+
+右外连接（Right Outer Join）
+
+SELECT * FROM table1 RIGHT JOIN table2 ON table1.column_name = table2.column_name;
+
+完全外连接（Full Outer Join）
+
+SELECT * FROM table1 FULL JOIN table2 ON table1.column_name = table2.column_name;
+
+**自连接**
+SELECT * FROM TABLE1 别名 ， TABLE2 别名 WHERE 条件
+
+**联合查询**
+SELECT column1, column2 FROM table1
+UNION
+SELECT column1, column2 FROM table2;
+
+需要注意的是，UNION会自动去除重复的行。如果想保留重复行，可以使用UNION ALL关键字。
+
+SELECT column1, column2 FROM table1
+UNION ALL
+SELECT column1, column2 FROM table2;
+
+**子查询**
