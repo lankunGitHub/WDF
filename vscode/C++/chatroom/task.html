@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>task</title>
+</head>
+<body>
+  <script>
+// 创建 WebSocket 连接
+const socket = new WebSocket('ws://10.30.0.206:8080');
+let hhh = {
+  a:1,
+  b:2,
+  c:{
+    d:3,
+    e:4
+  },
+  f:5
+}
+// 当连接建立时执行
+socket.onopen = function(event) {
+  socket.send("你好");
+  console.log('WebSocket连接已建立');
+};
+
+// 当收到消息时执行
+socket.onmessage = function(event) {
+  socket.send(JSON.stringify(hhh))
+  console.log('收到消息：', event.data);
+};
+
+// 当连接关闭时执行
+socket.onclose = function(event) {
+  if (event.wasClean) {
+    console.log('WebSocket连接已正常关闭');
+  } else {
+    console.log('WebSocket连接意外关闭'); // 连接意外关闭时打印错误信息
+    console.log('错误码：', event.code);
+    console.log('原因：', event.reason);
+  }
+};
+
+// 当连接发生错误时执行
+socket.onerror = function(error) {
+  console.error('WebSocket连接发生错误：', error);
+};
+  </script>
+</body>
+</html>

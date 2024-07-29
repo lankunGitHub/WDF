@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.2)
+project(test)
+set(CMAKE_CXX_STANDARD 20)
+set(EXECUTABLE_OUTPUT_PATH /home/lk/vscode/camke_test)
+#set(SRC main.cc addfunction.hpp mulfunction.hpp)
+#aux_source_directory(${PROJECT_SOURCE_DIR} SRC)
+add_executable(demo ${SRC})

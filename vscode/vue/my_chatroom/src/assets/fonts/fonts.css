@@ -1,0 +1,20 @@
+@font-face {
+  font-family: 'AmaticSC-Bold';
+  src: url('./AmaticSC-Bold.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'longzangti';
+  src: url('./有字库龙藏体.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'AmaticSC-Regular';
+  src: url('./AmaticSC-Regular.ttf');
+  font-weight: normal;
+  font-style: normal;
+}

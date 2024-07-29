@@ -1,0 +1,37 @@
+/*标签选择器,直接使用标签名
+        p{
+            color: rgb(0, 17, 255);
+            font-size: 30px;
+        }
+        div{
+            color: aqua;
+            font-size: 40px;
+        }*/
+
+        /*类选择器,可以调用多个类名
+        .red{
+            color: rgb(169, 42, 128);
+        }*/
+
+        /*id选择器,只能使用一次
+        #pink{
+            color: pink;
+        }*/
+        /*通配符选择器
+        *{
+            color: red;
+        }*/
+        /*字体属性*/
+        .font{
+            font-family: "Microsoft Yahei";
+            font-size: 50px;
+            font-weight: 700;
+            font-style: italic;
+        }
+        .text{
+            color: deeppink;
+            text-align: center;
+            text-decoration: underline;
+            text-indent: 2em;
+            line-height: 2em;
+        }

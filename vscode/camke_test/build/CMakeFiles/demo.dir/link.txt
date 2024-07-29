@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/demo.dir/main.cc.o -o /home/lk/vscode/cmake_test/demo

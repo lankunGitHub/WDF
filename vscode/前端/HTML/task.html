@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <input type="text" v-model="username">
+    </div>
+    <script>
+        const app = new Vue({
+            el: '#app',
+
+            data: {
+                list: ["西瓜", "葡萄", "橘子"],
+                username: '',
+                password: '',
+                percent: 0,
+            },
+
+            computed: {
+
+            },
+
+            watch:{
+                
+            }
+        })
+        console.log(app.password)
+        console.log(app.username)
+    </script>
+</body>
+
+</html>
